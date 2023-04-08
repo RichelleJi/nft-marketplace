@@ -5,6 +5,7 @@ import slingshotfinanceLogo from '../assets/slingshot-finance-logo.png'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CgProfile } from 'react-icons/cg'
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md'
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const style = {
   wrapper: `bg-[#04111d] w-screen px-[1.2rem] py-[0.8rem] flex `,
@@ -38,17 +39,15 @@ const Header = () => {
       </div>
       <div className={style.headerItems}>
         <Link href="/collections/0x66a576A977b7Bccf510630E0aA5e450EC11361Fa">
-          <div className={style.headerItem}> Collections </div>
+          <div className={style.headerItem}> Discover </div>
         </Link>
-        <div className={style.headerItem}> Stats </div>
-        <div className={style.headerItem}> Resources </div>
-        <div className={style.headerItem}> Create </div>
+        <Link href="/list">
+          <div className={style.headerItem}> List </div>
+        </Link>
         <div className={style.headerIcon}>
           <CgProfile />
         </div>
-        <div className={style.headerIcon}>
-          <MdOutlineAccountBalanceWallet />
-        </div>
+        <ConnectButton/>
       </div>
     </div>
   )
