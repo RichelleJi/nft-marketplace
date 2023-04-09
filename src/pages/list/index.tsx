@@ -1,5 +1,9 @@
 import React from 'react'
 import Header from '../../components/Header'
+import { useState } from "react";
+import GuiseMarketplace from '../../../contracts/GuiseMarketplace.json'
+import { erc721ABI } from 'wagmi'
+
 
 const style = {
   wrapper: `relative`,
@@ -16,10 +20,56 @@ const style = {
   author: `flex flex-col justify-center ml-4`,
   name: ``,
   infoIcon: `flex justify-end items-center flex-1 text-[#8a939b] text-3xl font-bold`,
-  input_label: `block text-[#e4e8ea] font-bold mb-2`
+  input_label: `block text-[#e4e8ea] font-bold mb-2`,
+  input_box: `border border-gray-400 py-2 px-3 w-full rounded-md`
 }
 
-const Hero = () => {
+
+const ListNFT = () => {
+  let initialFormParamsState = { nftAddress: '', token_id: '', price: '', expirationDate: ''};
+  const [formParams, updateFormParams] = useState(initialFormParamsState);
+  const ethers = require("ethers");
+  const [message, updateMessage] = useState('');
+
+  async function listNFT(e) {
+     e.preventDefault();
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      updateMessage("Please wait.. uploading (upto 5 mins)")
+      // todo: check input format
+
+      //get approval
+      let erc721Contract = new ethers.Contract(formParams.nftAddress, erc721ABI, signer)
+      const isApproved = await erc721Contract.isApprovedForAll(GuiseMarketplace.address, formParams.nftAddress); //todo: could track the approval in the db
+        console.log("Is approved for all: ", isApproved);  // returns false even after several attempts
+
+      //todo: one promise needs to wait for another to finish, maybe chain it
+      if (isApproved == false) {
+        await erc721Contract.setApprovalForAll(GuiseMarketplace.address, true);  // seems to work fine, even shows in MetaMask activity
+      }
+
+      let contract = new ethers.Contract(GuiseMarketplace.address, GuiseMarketplace.abi, signer)
+
+      const price = ethers.utils.parseUnits(formParams.price, 'ether')
+
+      let transaction = await contract.createListing(formParams.nftAddress, formParams.token_id, price, formParams.expirationDate)
+      // (metadataURL, price, { value: listingPrice })
+      await transaction.wait()
+
+      alert("Successfully listed your NFT!");
+      updateMessage("");
+      updateFormParams(initialFormParamsState);
+      window.location.replace("/list")
+      // todo: delete console.log("form --> " + JSON.stringify(formParams))
+    }
+    catch (err) {
+      alert("NFT listing failed!");
+      console.log(err)
+    }
+  }
+
   return (
     <>
       <Header />
@@ -56,20 +106,22 @@ const Hero = () => {
                 </label>
                 <input
                   type="text"
-                  className="border border-gray-400 py-2 px-3 w-full rounded-md"
+                  className={style.input_box}
                   placeholder="Enter NFT Address"
-                  // value={nftAddress}
+                  onChange={e => updateFormParams({...formParams, nftAddress: e.target.value})}
+                  value={formParams.nftAddress}
                 />
               </div>
               <div className="mb-4">
                 <label className={style.input_label}>
-                  Token Number
+                  Token ID
                 </label>
                 <input
                   type="number"
-                  className="border border-gray-400 py-2 px-3 w-full rounded-md"
-                  placeholder="Enter Token Number"
-                  // value={tokenNumber}
+                  className={style.input_box}
+                  placeholder="Enter Token ID"
+                  onChange={e => updateFormParams({...formParams, token_id: e.target.value})}
+                  value={formParams.token_id}
                 />
               </div>
               <div className="mb-4">
@@ -78,13 +130,28 @@ const Hero = () => {
                 </label>
                 <input
                   type="number"
-                  className="border border-gray-400 py-2 px-3 w-full rounded-md"
+                  className={style.input_box}
                   placeholder="Enter Price"
-                  // value={price}
+                  onChange={e => updateFormParams({...formParams, price: e.target.value})}
+                  value={formParams.price}
                 />
               </div>
+                <div className="mb-4">
+                  <label className={style.input_label}>
+                    Expiration date
+                  </label>
+                    <input
+                      type="number"
+                      className={style.input_box}
+                      placeholder="Enter in YYYY-MM-DD format"
+                      onChange={e => updateFormParams({...formParams, expirationDate: e.target.value})}
+                      value={formParams.expirationDate}
+                    />
+                </div>
               <div className="flex justify-center">
-                <button className={style.button}>List</button>
+                <button className={style.button} onClick={listNFT} >
+                  List
+                </button>
               </div>
             </div>
           </div>
@@ -94,4 +161,4 @@ const Hero = () => {
   )
 }
 
-export default Hero
+export default ListNFT
