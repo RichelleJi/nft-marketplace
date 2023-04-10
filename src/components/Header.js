@@ -4,7 +4,6 @@ import React from 'react'
 import slingshotfinanceLogo from '../assets/slingshot-finance-logo.png'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { CgProfile } from 'react-icons/cg'
-import { MdOutlineAccountBalanceWallet } from 'react-icons/md'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const style = {

@@ -9,17 +9,12 @@ const style = {
   wrapper: `relative`,
   container: `before:content-[''] before:bg-red-500 before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:bg-[url('https://dl.openseauserdata.com/cache/originImage/files/5eb78dc393ad9af3627bbd08283dc5ab.jpg')] before:bg-cover before:bg-center before:opacity-30 before:blur`,
   contentWrapper: `flex h-screen relative justify-center flex-wrap items-center`,
-  copyContainer: `w-1/2 `,
   title: `relative text-white text-[30px] font-semibold mb-4`,
-  description: `text-[#8a939b] container-[420px] text-2xl mt-[0.8rem] mb-[2.5rem]`,
-  ctaContainer: `flex`,
-  accentedButton: ` relative text-lg font-semibold px-12 py-4 bg-[#65fe98] rounded-lg mr-5 text-white hover:bg-[#46a365] cursor-pointer`,
   button: ` relative text-lg font-semibold px-12 py-3 bg-[#363840] rounded-lg mr-5 text-[#e4e8ea] hover:bg-[#4c505c] cursor-pointer`,
   cardContainer: `rounded-[3rem] mx-9`,
   infoContainer: `h-20 bg-[#313338] p-4 rounded-b-lg flex items-center text-white`,
   author: `flex flex-col justify-center ml-4`,
   name: ``,
-  infoIcon: `flex justify-end items-center flex-1 text-[#8a939b] text-3xl font-bold`,
   input_label: `block text-[#e4e8ea] font-bold mb-2`,
   input_box: `border border-gray-400 py-2 px-3 w-full rounded-md`
 }
@@ -38,31 +33,25 @@ const ListNFT = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       updateMessage("Please wait.. uploading (upto 5 mins)")
-      // todo: check input format
+      // todo: sanity check input format
 
-      //get approval
       let erc721Contract = new ethers.Contract(formParams.nftAddress, erc721ABI, signer)
-      const isApproved = await erc721Contract.isApprovedForAll(GuiseMarketplace.address, formParams.nftAddress); //todo: could track the approval in the db
-        console.log("Is approved for all: ", isApproved);  // returns false even after several attempts
 
-      //todo: one promise needs to wait for another to finish, maybe chain it
-      if (isApproved == false) {
-        await erc721Contract.setApprovalForAll(GuiseMarketplace.address, true);  // seems to work fine, even shows in MetaMask activity
-      }
+      //it looks like approval is needed for every NFT of the same holder
+      await erc721Contract.setApprovalForAll(GuiseMarketplace.address, true);  // seems to work fine, even shows in MetaMask activity
 
       let contract = new ethers.Contract(GuiseMarketplace.address, GuiseMarketplace.abi, signer)
 
       const price = ethers.utils.parseUnits(formParams.price, 'ether')
 
       let transaction = await contract.createListing(formParams.nftAddress, formParams.token_id, price, formParams.expirationDate)
-      // (metadataURL, price, { value: listingPrice })
+
       await transaction.wait()
 
       alert("Successfully listed your NFT!");
       updateMessage("");
       updateFormParams(initialFormParamsState);
       window.location.replace("/list")
-      // todo: delete console.log("form --> " + JSON.stringify(formParams))
     }
     catch (err) {
       alert("NFT listing failed!");
