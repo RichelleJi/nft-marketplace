@@ -4,6 +4,7 @@ import config from "../../../config";
 
 
 const DEFAULT_LISTING_STATUS = "active";
+const DEFAULT_NFT_IMAGE = "https://ipfs.thirdwebcdn.com/ipfs/QmdZujrr8QELXRHPae1eu7E7YqCVSXjkMetC6YLSRYiypZ/0%20(7).png"
 
 const handler = async (req, res) => {
   let logs = req.body.event.data.block.logs
@@ -38,7 +39,8 @@ const saveNFTListing = async (listingId, seller, nftAddress, tokenId, price, exp
       nftTokenId: tokenId,
       price: price,
       status: DEFAULT_LISTING_STATUS,
-      expirationDate: expirationTime
+      expirationDate: expirationTime,
+      imageLink: DEFAULT_NFT_IMAGE
     })
 }
 
