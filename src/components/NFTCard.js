@@ -13,7 +13,6 @@ const style = {
 }
 
 const NFTCard = ({ nftListing }) => {
-  console.log("data----->", nftListing.imageLink)
   const image = nftListing.imageLink
 
   return (
