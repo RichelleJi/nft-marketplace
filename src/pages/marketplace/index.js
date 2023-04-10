@@ -25,26 +25,6 @@ export const getServerSideProps = async () => {
     .select()
     .eq('status', 'active')
 
-  // const listingId = 7;
-  // const seller = '0x0C5Cc5399BFF7f213810323aa97FeF5f60ed7642';
-  // const nftAddress = '0x2e992749E96D7071bb80446f369a90c4c1f9f8bC';
-  // const tokenId = 9;
-  // const price = 0.9;
-  // const expirationTime = new Date(9999, 11, 31);
-  // const { error } = await supabase
-  //   .from('NftListings')
-  //   .insert({
-  //     id: listingId,
-  //     sellerAddress: seller,
-  //     nftAddress: nftAddress,
-  //     nftTokenId: tokenId,
-  //     price: price,
-  //     status: "active",
-  //     expirationDate: expirationTime
-  //   })
-
-  // console.log("eroor----> ", error)
-
   let nftListings = JSON.parse(JSON.stringify(data));
 
   return {
