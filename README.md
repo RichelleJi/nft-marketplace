@@ -8,13 +8,13 @@ a light client for an NFT marketplace that allows users to list their NFT in a M
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 
-###Step 1
+### Step 1
 ```bash
 yarn dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 ___
-###Step 2 Get [Ngrok](https://ngrok.com/)
+### Step 2 Get [Ngrok](https://ngrok.com/)
 For receiving smart contract webhooks from Alchemy's Notify
 
 Copy the output of the following, should look similar to`https://a662-173-247-204-214.ngrok-free.app`
@@ -22,7 +22,7 @@ Copy the output of the following, should look similar to`https://a662-173-247-20
 ngrok http 3000
 ```
 ___
-###Step 3 set up webhook at [Alchemy's Notify](https://dashboard.alchemy.com/notify)
+### Step 3 set up webhook at [Alchemy's Notify](https://dashboard.alchemy.com/notify)
 Click the following:
 
 a. Create a GraphQL webhook ![img.png](img.png)
@@ -35,12 +35,12 @@ d. click  ![img_3.png](img_3.png)
 
 ---
 
-###Step 3: 
+### Step 3: 
 Obtain Supabase credentials from the author
 
 ---
 
-##Design decisions: 
+### Design decisions: 
 user flow: 
 user goes to `/list` page and input NFT details, and then click list. A request is made to the smart contract, and an 
 ItemListed event is emitted. The event is then picked up by Alchemy's Notify, and a webhook is sent to the 
@@ -83,7 +83,7 @@ cache
 more features, and interactions with users
 - if  not sigh in 
 
-###Project's Stack:
+### Project's Stack:
 
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
