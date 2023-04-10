@@ -1,6 +1,6 @@
 
 ## About
-a light client for an NFT marketplace that allows users to list their NFT in a Marketplace. 
+a light client for an NFT marketplace that allows users to list their NFT in a Marketplace and discover NFT listed. 
 
 
 
