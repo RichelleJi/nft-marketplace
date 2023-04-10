@@ -3,6 +3,7 @@ import Header from '../../components/Header'
 import { useState } from "react";
 import GuiseMarketplace from '../../../contracts/GuiseMarketplace.json'
 import { erc721ABI } from 'wagmi'
+import {type} from "os";
 
 
 const style = {
@@ -21,7 +22,7 @@ const style = {
 
 
 const ListNFT = () => {
-  let initialFormParamsState = { nftAddress: '', token_id: '', price: '', expirationDate: ''};
+  let initialFormParamsState = { nftAddress: '', tokenId: '', price: '', expirationDate: ''};
   const [formParams, updateFormParams] = useState(initialFormParamsState);
   const ethers = require("ethers");
   const [message, updateMessage] = useState('');
@@ -29,23 +30,27 @@ const ListNFT = () => {
   async function listNFT(e) {
      e.preventDefault();
 
-    try {
+    // todo: more sanity check input format
+     const expDate = Date.parse(formParams.expirationDate);
+     if (expDate < Date.now() && formParams.expirationDate !== "0") {
+       alert("Expiration date must be in the future");
+       return
+     }
+
+     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      updateMessage("Please wait.. uploading (upto 5 mins)")
-      // todo: sanity check input format
+      const guiseMarketplaceContract = new ethers.Contract(GuiseMarketplace.address, GuiseMarketplace.abi, signer)
+      const erc721Contract = new ethers.Contract(formParams.nftAddress, erc721ABI, signer)
 
-      let erc721Contract = new ethers.Contract(formParams.nftAddress, erc721ABI, signer)
-
-      //it looks like approval is needed for every NFT of the same holder
-      await erc721Contract.setApprovalForAll(GuiseMarketplace.address, true);  // seems to work fine, even shows in MetaMask activity
-
-      let contract = new ethers.Contract(GuiseMarketplace.address, GuiseMarketplace.abi, signer)
-
+      const expDateinEpoch = formParams.expirationDate === "0" ? "0" : Math.floor(expDate / 1000).toString()
       const price = ethers.utils.parseUnits(formParams.price, 'ether')
 
-      let transaction = await contract.createListing(formParams.nftAddress, formParams.token_id, price, formParams.expirationDate)
+      //it looks like approval is needed for every NFT of the same holder
+      const approval = await erc721Contract.setApprovalForAll(GuiseMarketplace.address, true);
+      await approval.wait()
 
+      const transaction = await guiseMarketplaceContract.createListing(formParams.nftAddress, formParams.tokenId, price, expDateinEpoch)
       await transaction.wait()
 
       alert("Successfully listed your NFT!");
@@ -109,8 +114,8 @@ const ListNFT = () => {
                   type="number"
                   className={style.input_box}
                   placeholder="Enter Token ID"
-                  onChange={e => updateFormParams({...formParams, token_id: e.target.value})}
-                  value={formParams.token_id}
+                  onChange={e => updateFormParams({...formParams, tokenId: e.target.value})}
+                  value={formParams.tokenId}
                 />
               </div>
               <div className="mb-4">
@@ -130,7 +135,6 @@ const ListNFT = () => {
                     Expiration date
                   </label>
                     <input
-                      type="number"
                       className={style.input_box}
                       placeholder="Enter in YYYY-MM-DD format"
                       onChange={e => updateFormParams({...formParams, expirationDate: e.target.value})}
